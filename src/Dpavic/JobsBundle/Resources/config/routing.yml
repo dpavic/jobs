@@ -1,0 +1,3 @@
+dpavic_jobs_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: DpavicJobsBundle:Default:index }
