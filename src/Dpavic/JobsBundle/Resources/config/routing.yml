@@ -1,3 +1,7 @@
 dpavic_jobs_homepage:
     path:     /hello/{name}
     defaults: { _controller: DpavicJobsBundle:Default:index }
+    
+jobs: 
+    resource: "@DpavicJobsBundle/Controller/JobController.php"
+    type:   annotation
