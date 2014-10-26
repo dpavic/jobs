@@ -16,22 +16,22 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\OneToMany(targetEntity="Job", mappedBy="category")
      */
-    protected $jobs;
+    private $jobs;
 
     /**
      * @ORM\ManyToMany(targetEntity="Affiliate", mappedBy="categories")
      */
-    protected $affiliates;
+    private $affiliates;
 
     /**
      * @ORM\Column(type="string", length=100)
      */
-    protected $name;
+    private $name;
 
     /**
      * Constructor
@@ -40,6 +40,11 @@ class Category
     {
         $this->jobs = new \Doctrine\Common\Collections\ArrayCollection();
         $this->affiliates = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+    public function __toString()
+    {
+        return $this->getName() ? $this->getName() : "";
     }
 
     /**

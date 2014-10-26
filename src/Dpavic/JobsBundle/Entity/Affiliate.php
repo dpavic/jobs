@@ -17,7 +17,7 @@ class Affiliate
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\ManyToMany(targetEntity="Category", inversedBy="affiliates")
@@ -25,32 +25,32 @@ class Affiliate
      *      joinColumns={@ORM\JoinColumn(name="affiliate_id", referencedColumnName="id")}, 
      *      inverseJoinColumns={@ORM\JoinColumn(name="category_id", referencedColumnName="id")})
      */
-    protected $categories;
+    private $categories;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $url;
+    private $url;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $token;
+    private $token;
 
     /**
      * @ORM\Column(type="boolean", name="is_active", nullable=true)
      */
-    protected $isActive;
+    private $isActive;
 
     /**
      * @ORM\Column(type="datetime", name="created_at")
      */
-    protected $createdAt;
+    private $createdAt;
 
     /**
      * Constructor
@@ -164,8 +164,7 @@ class Affiliate
 
     /**
      * Set createdAt
-     *
-     * @param \DateTime $createdAt
+     * @ORM\PrePersist
      * @return Affiliate
      */
     public function setCreatedAt()

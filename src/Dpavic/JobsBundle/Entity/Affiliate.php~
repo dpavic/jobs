@@ -53,6 +53,14 @@ class Affiliate
     protected $createdAt;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
      * Get id
      *
      * @return integer 
@@ -156,8 +164,7 @@ class Affiliate
 
     /**
      * Set createdAt
-     *
-     * @param \DateTime $createdAt
+     * @ORM\PrePersist
      * @return Affiliate
      */
     public function setCreatedAt()
@@ -173,6 +180,39 @@ class Affiliate
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Add categories
+     *
+     * @param \Dpavic\JobsBundle\Entity\Category $categories
+     * @return Affiliate
+     */
+    public function addCategory(\Dpavic\JobsBundle\Entity\Category $categories)
+    {
+        $this->categories[] = $categories;
+
+        return $this;
+    }
+
+    /**
+     * Remove categories
+     *
+     * @param \Dpavic\JobsBundle\Entity\Category $categories
+     */
+    public function removeCategory(\Dpavic\JobsBundle\Entity\Category $categories)
+    {
+        $this->categories->removeElement($categories);
+    }
+
+    /**
+     * Get categories
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCategories()
+    {
+        return $this->categories;
     }
 
 }

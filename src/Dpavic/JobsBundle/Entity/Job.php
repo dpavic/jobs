@@ -5,7 +5,7 @@ namespace Dpavic\JobsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="job")
  */
@@ -17,88 +17,88 @@ class Job
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
-    
+    private $id;
+
     /**
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="jobs")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
-    protected $category;
+    private $category;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $type;
+    private $type;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $company;
+    private $company;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $logo;
+    private $logo;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $url;
+    private $url;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $position;
+    private $position;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $location;
+    private $location;
 
     /**
      * @ORM\Column(type="text")
      */
-    protected $description;
+    private $description;
 
     /**
      * @ORM\Column(type="text", name="how_to_apply")
      */
-    protected $howToApply;
+    private $howToApply;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    protected $token;
+    private $token;
 
     /**
      * @ORM\Column(type="boolean", name="is_public", nullable=true)
      */
-    protected $isPublic;
+    private $isPublic;
 
     /**
      * @ORM\Column(type="boolean", name="is_activated", nullable=true)
      */
-    protected $isActivated;
+    private $isActivated;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(type="datetime", name="expires_at")
      */
-    protected $expiresAt;
+    private $expiresAt;
 
     /**
      * @ORM\Column(type="datetime", name="created_at")
      */
-    protected $createdAt;
+    public $createdAt;
 
     /**
      * @ORM\Column(type="datetime", name="updated_at", nullable=true)
      */
-    protected $updatedAt;
+    public $updatedAt;
 
     /**
      * Get id
@@ -411,12 +411,9 @@ class Job
 
     /**
      * Set createdAt
-     * @ORM\PrePersist 
-     *
-     * @param \DateTime $createdAt
-     * @return Job
+     * @ORM\PrePersist
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt()
     {
         if (!$this->getCreatedAt()) {
             $this->createdAt = new \DateTime();
@@ -435,10 +432,7 @@ class Job
 
     /**
      * Set updatedAt
-     * @ORM\PrePersist
-     * 
-     * @param \DateTime $updatedAt
-     * @return Job
+     * @ORM\PreUpdate
      */
     public function setUpdatedAt()
     {
@@ -454,7 +448,6 @@ class Job
     {
         return $this->updatedAt;
     }
-
 
     /**
      * Set category
@@ -478,4 +471,5 @@ class Job
     {
         return $this->category;
     }
+
 }
