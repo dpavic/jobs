@@ -5,7 +5,7 @@ namespace Dpavic\JobsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\CategoryRepository")
  * @ORM\Table(name="category")
  */
 class Category
@@ -32,6 +32,7 @@ class Category
      * @ORM\Column(type="string", length=100)
      */
     private $name;
+    private $activeJobs;
 
     /**
      * Constructor
@@ -41,7 +42,7 @@ class Category
         $this->jobs = new \Doctrine\Common\Collections\ArrayCollection();
         $this->affiliates = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     public function __toString()
     {
         return $this->getName() ? $this->getName() : "";
@@ -145,5 +146,16 @@ class Category
     {
         return $this->affiliates;
     }
+    
+    function getActiveJobs()
+    {
+        return $this->activeJobs;
+    }
+
+    function setActiveJobs($activeJobs)
+    {
+        $this->activeJobs = $activeJobs;
+    }
+
 
 }

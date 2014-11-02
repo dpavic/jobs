@@ -28,13 +28,19 @@ class JobController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('DpavicJobsBundle:Job')->findAll();
+        $categories = $em->getRepository('DpavicJobsBundle:Category')->getWithJobs();
+        
+        foreach ($categories as $category){
+            $category->setActiveJobs($em->getRepository('DpavicJobsBundle:Job')
+                    ->getActiveJobs($category->getId()));
+        }
+        $entities = $em->getRepository('DpavicJobsBundle:Job')->getActiveJobs();
 
         return array(
-            'entities' => $entities,
+            'categories' => $categories,
         );
     }
+
     /**
      * Creates a new Job entity.
      *
@@ -58,7 +64,7 @@ class JobController extends Controller
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         );
     }
 
@@ -91,18 +97,18 @@ class JobController extends Controller
     public function newAction()
     {
         $entity = new Job();
-        $form   = $this->createCreateForm($entity);
+        $form = $this->createCreateForm($entity);
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         );
     }
 
     /**
      * Finds and displays a Job entity.
      *
-     * @Route("/{id}", name="job_show")
+     * @Route("/{company}/{location}/{id}/{position}", requirements={"id" = "\d+"}, name="job_show")
      * @Method("GET")
      * @Template()
      */
@@ -119,7 +125,7 @@ class JobController extends Controller
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
+            'entity' => $entity,
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -145,19 +151,19 @@ class JobController extends Controller
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         );
     }
 
     /**
-    * Creates a form to edit a Job entity.
-    *
-    * @param Job $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
+     * Creates a form to edit a Job entity.
+     *
+     * @param Job $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
     private function createEditForm(Job $entity)
     {
         $form = $this->createForm(new JobType(), $entity, array(
@@ -169,6 +175,7 @@ class JobController extends Controller
 
         return $form;
     }
+
     /**
      * Edits an existing Job entity.
      *
@@ -197,11 +204,12 @@ class JobController extends Controller
         }
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         );
     }
+
     /**
      * Deletes a Job entity.
      *
@@ -238,9 +246,10 @@ class JobController extends Controller
     private function createDeleteForm($id)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('job_delete', array('id' => $id)))
-            ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
-            ->getForm();
+                        ->setAction($this->generateUrl('job_delete', array('id' => $id)))
+                        ->setMethod('DELETE')
+                        ->add('submit', 'submit', array('label' => 'Delete'))
+                        ->getForm();
     }
+
 }

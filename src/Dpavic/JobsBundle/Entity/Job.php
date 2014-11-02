@@ -3,9 +3,10 @@
 namespace Dpavic\JobsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dpavic\JobsBundle\Utils\Jobs as Jobs;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\JobRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="job")
  */
@@ -93,12 +94,12 @@ class Job
     /**
      * @ORM\Column(type="datetime", name="created_at")
      */
-    public $createdAt;
+    private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", name="updated_at", nullable=true)
      */
-    public $updatedAt;
+    private $updatedAt;
 
     /**
      * Get id
@@ -388,15 +389,17 @@ class Job
 
     /**
      * Set expiresAt
-     *
+     * @ORM\PrePersist
      * @param \DateTime $expiresAt
      * @return Job
      */
-    public function setExpiresAt($expiresAt)
+    public function setExpiresAt()
     {
-        $this->expiresAt = $expiresAt;
-
-        return $this;
+        if(!$this->getExpiresAt()){
+            $now = $this->getCreatedAt() ? $this->getCreatedAt()->format('U') : time();
+        
+            $this->expiresAt = new \DateTime(date('Y-m-d H:i:s', $now + 86400 * 30));
+        }
     }
 
     /**
@@ -452,10 +455,10 @@ class Job
     /**
      * Set category
      *
-     * @param \Dpavic\JobsBundle\Entity\Category $category
+     * @param Category $category
      * @return Job
      */
-    public function setCategory(\Dpavic\JobsBundle\Entity\Category $category = null)
+    public function setCategory(Category $category = null)
     {
         $this->category = $category;
 
@@ -465,11 +468,26 @@ class Job
     /**
      * Get category
      *
-     * @return \Dpavic\JobsBundle\Entity\Category 
+     * @return Category 
      */
     public function getCategory()
     {
         return $this->category;
+    }
+
+    public function getCompanySlug()
+    {
+        return Jobs::slugify($this->getCompany());
+    }
+
+    public function getPositionSlug()
+    {
+        return Jobs::slugify($this->getPosition());
+    }
+
+    public function getLocationSlug()
+    {
+        return Jobs::slugify($this->getLocation());
     }
 
 }

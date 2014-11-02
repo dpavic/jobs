@@ -3,9 +3,10 @@
 namespace Dpavic\JobsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dpavic\JobsBundle\Utils\Jobs as Jobs;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\JobRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="job")
  */
@@ -17,88 +18,88 @@ class Job
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="jobs")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
-    protected $category;
+    private $category;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $type;
+    private $type;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $company;
+    private $company;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $logo;
+    private $logo;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    protected $url;
+    private $url;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $position;
+    private $position;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $location;
+    private $location;
 
     /**
      * @ORM\Column(type="text")
      */
-    protected $description;
+    private $description;
 
     /**
      * @ORM\Column(type="text", name="how_to_apply")
      */
-    protected $howToApply;
+    private $howToApply;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    protected $token;
+    private $token;
 
     /**
      * @ORM\Column(type="boolean", name="is_public", nullable=true)
      */
-    protected $isPublic;
+    private $isPublic;
 
     /**
      * @ORM\Column(type="boolean", name="is_activated", nullable=true)
      */
-    protected $isActivated;
+    private $isActivated;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(type="datetime", name="expires_at")
      */
-    protected $expiresAt;
+    private $expiresAt;
 
     /**
      * @ORM\Column(type="datetime", name="created_at")
      */
-    protected $createdAt;
+    private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", name="updated_at", nullable=true)
      */
-    protected $updatedAt;
+    private $updatedAt;
 
     /**
      * Get id
@@ -388,15 +389,17 @@ class Job
 
     /**
      * Set expiresAt
-     *
+     * @ORM\PrePersist
      * @param \DateTime $expiresAt
      * @return Job
      */
-    public function setExpiresAt($expiresAt)
+    public function setExpiresAt()
     {
-        $this->expiresAt = $expiresAt;
-
-        return $this;
+        if(!$this->getExpiresAt()){
+            $now = $this->getCreatedAt() ? $this->getCreatedAt()->format('U') : time();
+        
+            $this->expiresAt = new \DateTime(date('Y-m-d H:i:s', $now + 86400 * 30));
+        }
     }
 
     /**
@@ -411,7 +414,7 @@ class Job
 
     /**
      * Set createdAt
-     * @ORM\PrePersist 
+     * @ORM\PrePersist
      */
     public function setCreatedAt()
     {
@@ -452,10 +455,10 @@ class Job
     /**
      * Set category
      *
-     * @param \Dpavic\JobsBundle\Entity\Category $category
+     * @param Category $category
      * @return Job
      */
-    public function setCategory(\Dpavic\JobsBundle\Entity\Category $category = null)
+    public function setCategory(Category $category = null)
     {
         $this->category = $category;
 
@@ -465,11 +468,26 @@ class Job
     /**
      * Get category
      *
-     * @return \Dpavic\JobsBundle\Entity\Category 
+     * @return Category 
      */
     public function getCategory()
     {
         return $this->category;
+    }
+
+    public function getCompanySlug()
+    {
+        return Jobs::slugify($this->getCompany());
+    }
+
+    public function getPositionSlug()
+    {
+        return Jobs::slugify($this->getPosition());
+    }
+
+    public function getLocationSlug()
+    {
+        return Jobs::slugify($this->getLocation());
     }
 
 }
