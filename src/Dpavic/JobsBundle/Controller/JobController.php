@@ -28,11 +28,14 @@ class JobController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $categories = $em->getRepository('DpavicJobsBundle:Category')->getWithJobs();
-        
-        foreach ($categories as $category){
+        $categories = $em->getRepository('DpavicJobsBundle:Category')
+                ->getWithJobs();
+
+        foreach ($categories as $category) {
             $category->setActiveJobs($em->getRepository('DpavicJobsBundle:Job')
-                    ->getActiveJobs($category->getId()));
+                            ->getActiveJobs($category->getId(), $this->container
+                                    ->getParameter('max_jobs_on_homepage'))
+            );
         }
         $entities = $em->getRepository('DpavicJobsBundle:Job')->getActiveJobs();
 
@@ -116,7 +119,7 @@ class JobController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('DpavicJobsBundle:Job')->find($id);
+        $entity = $em->getRepository('DpavicJobsBundle:Job')->getActiveJob($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Job entity.');
