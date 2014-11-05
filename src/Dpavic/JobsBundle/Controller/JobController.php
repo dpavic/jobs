@@ -32,12 +32,15 @@ class JobController extends Controller
                 ->getWithJobs();
 
         foreach ($categories as $category) {
+            /* @var $category \Dpavic\JobsBundle\Entity\Category */
             $category->setActiveJobs($em->getRepository('DpavicJobsBundle:Job')
                             ->getActiveJobs($category->getId(), $this->container
-                                    ->getParameter('max_jobs_on_homepage'))
-            );
+                                    ->getParameter('max_jobs_on_homepage')));
+            
+            $category->setMoreJobs($em->getRepository('DpavicJobsBundle:Job')
+                            ->countActiveJobs($category->getId()) - $this->container
+                            ->getParameter('max_jobs_on_homepage'));
         }
-        $entities = $em->getRepository('DpavicJobsBundle:Job')->getActiveJobs();
 
         return array(
             'categories' => $categories,

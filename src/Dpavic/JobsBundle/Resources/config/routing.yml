@@ -5,3 +5,7 @@ dpavic_jobs_homepage:
 jobs: 
     resource: "@DpavicJobsBundle/Controller/JobController.php"
     type:   annotation
+
+category:
+    resource: "@DpavicJobsBundle/Controller/CategoryController.php"
+    type:   annotation

@@ -3,13 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Entity/Category.php</file>
             <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/JobController.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Repository/CategoryRepository.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/DataFixtures/ORM/LoadJobData.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Repository/JobRepository.php</file>
+            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Resources/config/routing.yml</file>
             <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Entity/Job.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Resources/views/Job/index.html.twig</file>
+            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/CategoryController.php</file>
         </group>
     </open-files>
 </project-private>

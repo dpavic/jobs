@@ -3,9 +3,11 @@
 namespace Dpavic\JobsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dpavic\JobsBundle\Utils\Jobs as Jobs;
 
 /**
  * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\CategoryRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="category")
  */
 class Category
@@ -32,7 +34,13 @@ class Category
      * @ORM\Column(type="string", length=100)
      */
     private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true, nullable=true)
+     */
+    private $slug;
     private $activeJobs;
+    private $moreJobs;
 
     /**
      * Constructor
@@ -146,16 +154,53 @@ class Category
     {
         return $this->affiliates;
     }
-    
-    function getActiveJobs()
+
+    public function getActiveJobs()
     {
         return $this->activeJobs;
     }
 
-    function setActiveJobs($activeJobs)
+    public function setActiveJobs($activeJobs)
     {
         $this->activeJobs = $activeJobs;
     }
 
+    function getMoreJobs()
+    {
+        return $this->moreJobs;
+    }
+
+    function setMoreJobs($moreJobs)
+    {
+        $this->moreJobs = $moreJobs >= 0 ? $moreJobs : 0;
+    }
+
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     * @return Category
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug
+     *
+     * @return string 
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    public function setSlugValue()
+    {
+        $this->slug = \Jobs::slugify($this->getName());
+    }
 
 }

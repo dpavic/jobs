@@ -3,9 +3,11 @@
 namespace Dpavic\JobsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dpavic\JobsBundle\Utils\Jobs as Jobs;
 
 /**
  * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\CategoryRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="category")
  */
 class Category
@@ -32,6 +34,15 @@ class Category
      * @ORM\Column(type="string", length=100)
      */
     private $name;
+    
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     */
+    private $slug;
+
+    private $activeJobs;
+    
+    private $moreJobs;
 
     /**
      * Constructor
@@ -41,7 +52,7 @@ class Category
         $this->jobs = new \Doctrine\Common\Collections\ArrayCollection();
         $this->affiliates = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     public function __toString()
     {
         return $this->getName() ? $this->getName() : "";
@@ -145,5 +156,27 @@ class Category
     {
         return $this->affiliates;
     }
+
+    public function getActiveJobs()
+    {
+        return $this->activeJobs;
+    }
+
+    public function setActiveJobs($activeJobs)
+    {
+        $this->activeJobs = $activeJobs;
+    }
+
+    function getMoreJobs()
+    {
+        return $this->moreJobs;
+    }
+
+    function setMoreJobs($moreJobs)
+    {
+        $this->moreJobs = $moreJobs >= 0 ? $moreJobs : 0;
+    }
+
+    
 
 }
