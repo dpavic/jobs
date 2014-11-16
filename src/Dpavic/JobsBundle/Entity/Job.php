@@ -4,6 +4,7 @@ namespace Dpavic\JobsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dpavic\JobsBundle\Utils\Jobs as Jobs;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\JobRepository")
@@ -21,17 +22,21 @@ class Job
     private $id;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="jobs")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
     private $category;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\Choice(callback = "getTypeValues")
+     * @ORM\Column(type="string", length=255)
      */
     private $type;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255)
      */
     private $company;
@@ -42,31 +47,37 @@ class Job
     private $logo;
 
     /**
+     * @Assert\Url()
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $url;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255)
      */
     private $position;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255)
      */
     private $location;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="text")
      */
     private $description;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="text", name="how_to_apply")
      */
     private $howToApply;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $token;
@@ -82,6 +93,8 @@ class Job
     private $isActivated;
 
     /**
+     * @Assert\NotBlank()
+     * @Assert\Email()
      * @ORM\Column(type="string", length=255)
      */
     private $email;
@@ -100,6 +113,11 @@ class Job
      * @ORM\Column(type="datetime", name="updated_at", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @Assert\Image()
+     */
+    public $file;
 
     /**
      * Get id
@@ -395,9 +413,9 @@ class Job
      */
     public function setExpiresAt()
     {
-        if(!$this->getExpiresAt()){
+        if (!$this->getExpiresAt()) {
             $now = $this->getCreatedAt() ? $this->getCreatedAt()->format('U') : time();
-        
+
             $this->expiresAt = new \DateTime(date('Y-m-d H:i:s', $now + 86400 * 30));
         }
     }
@@ -488,6 +506,79 @@ class Job
     public function getLocationSlug()
     {
         return Jobs::slugify($this->getLocation());
+    }
+
+    //used in the form to get possible types for a Job
+    public static function getTypes()
+    {
+        return array('full-time' => 'Full time',
+            'part-time' => 'Part time',
+            'freelance' => 'Freelance');
+    }
+
+    //used in validation to get valid values for the type field
+    public static function getTypeValues()
+    {
+        return array_keys(self::getTypeValues());
+    }
+
+    protected function getUploadDir()
+    {
+        return 'uploads/jobs';
+    }
+
+    protected function getUploadDirRoot()
+    {
+        return __DIR__ . '/../../../../web/' . $this->getUploadDir();
+    }
+
+    public function getWebPath()
+    {
+        return null === $this->logo ? null : $this->getUploadDir() . '/' . $this->logo;
+    }
+
+    public function getAbsolutePath()
+    {
+        return null === $this->logo ? null : $this->getUploadDirRoot() . '/' . $this->logo;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function preUpload()
+    {
+        if (null !== $this->file) {
+            $this->logo = uniqid() . '.' . $this->file->guessExtension();
+        }
+    }
+
+    /**
+     * @ORM\PostPersist
+     */
+    public function upload()
+    {
+        if (null === $this->file) {
+            return;
+        }
+
+        // IF there is an error when moving file, an exception will be 
+        // automaticlly throw by move(). This will properly prevent the entity
+        // from being persisted to the datebase on error
+        $this->file->move($this->getUploadDirRoot(), $this->logo);
+
+        unset($this->file);
+    }
+
+    /**
+     * @ORM\PostRemove
+     */
+    public function removeUpload()
+    {
+        if (file_exists($file)) {
+            if ($file = $this->getAbsolutePath()) {
+                unlink($file);
+            }
+        }
     }
 
 }

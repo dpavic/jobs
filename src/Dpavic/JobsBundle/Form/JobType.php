@@ -2,12 +2,14 @@
 
 namespace Dpavic\JobsBundle\Form;
 
+use Dpavic\JobsBundle\Entity\Job;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class JobType extends AbstractType
 {
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -15,25 +17,23 @@ class JobType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('type')
-            ->add('company')
-            ->add('logo')
-            ->add('url')
-            ->add('position')
-            ->add('location')
-            ->add('description')
-            ->add('howToApply')
-            ->add('token')
-            ->add('isPublic')
-            ->add('isActivated')
-            ->add('email')
-            ->add('expiresAt')
-            ->add('createdAt')
-            ->add('updatedAt')
-            ->add('category')
+                ->add('type', 'choice', array('choices' => Job::getTypes(),
+                    'expanded' => true))
+                ->add('company')
+                ->add('file', 'file', array('label' => 'Company Logo', 
+                    'required' => false))
+                ->add('url')
+                ->add('position')
+                ->add('location')
+                ->add('description')
+                ->add('howToApply')
+                ->add('token')
+                ->add('isPublic')
+                ->add('email')
+                ->add('category')
         ;
     }
-    
+
     /**
      * @param OptionsResolverInterface $resolver
      */
@@ -51,4 +51,5 @@ class JobType extends AbstractType
     {
         return 'dpavic_jobsbundle_job';
     }
+
 }
