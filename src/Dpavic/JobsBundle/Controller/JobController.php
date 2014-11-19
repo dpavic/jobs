@@ -65,10 +65,10 @@ class JobController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('job_show', array(
+            return $this->redirect($this->generateUrl('job_preview', array(
                                 'company' => $entity->getCompanySlug(),
                                 'location' => $entity->getLocationSlug(),
-                                'id' => $entity->getId(),
+                                'token' => $entity->getToken(),
                                 'position' => $entity->getPositionSlug()
             )));
         }
@@ -108,7 +108,8 @@ class JobController extends Controller
     public function newAction()
     {
         $entity = new Job();
-        $form = $this->createCreateForm($entity);
+        $entity->setType('full-time');
+        $form = $this->createForm(new JobType(), $entity);
 
         return array(
             'entity' => $entity,
@@ -144,22 +145,22 @@ class JobController extends Controller
     /**
      * Displays a form to edit an existing Job entity.
      *
-     * @Route("/{id}/edit", name="job_edit")
+     * @Route("/{token}/edit", name="job_edit")
      * @Method("GET")
      * @Template()
      */
-    public function editAction($id)
+    public function editAction($token)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('DpavicJobsBundle:Job')->find($id);
+        $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Job entity.');
         }
 
-        $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
+        $editForm = $this->createForm(new JobType(), $entity);
+        $deleteForm = $this->createDeleteForm($token);
 
         return array(
             'entity' => $entity,
@@ -190,28 +191,34 @@ class JobController extends Controller
     /**
      * Edits an existing Job entity.
      *
-     * @Route("/{id}", name="job_update")
-     * @Method("PUT")
+     * @Route("/{token}/update", name="job_update")
+     * @Method("POST")
      * @Template("DpavicJobsBundle:Job:edit.html.twig")
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $token)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('DpavicJobsBundle:Job')->find($id);
+        $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Job entity.');
         }
 
-        $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createEditForm($entity);
-        $editForm->handleRequest($request);
+        $deleteForm = $this->createDeleteForm($token);
+        $editForm = $this->createForm(new JobType(), $entity);
+        $editForm->bind($request);
 
         if ($editForm->isValid()) {
+            $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('job_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('job_preview', array(
+                                'company' => $entity->getCompanySlug(),
+                                'location' => $entity->getLocationSlug(),
+                                'token' => $entity->getToken(),
+                                'position' => $entity->getPositionSlug()
+            )));
         }
 
         return array(
@@ -224,17 +231,17 @@ class JobController extends Controller
     /**
      * Deletes a Job entity.
      *
-     * @Route("/{id}", name="job_delete")
-     * @Method("DELETE")
+     * @Route("/{token}/delete", name="job_delete")
+     * @Method("DELETE|POST")
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $token)
     {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
+        $form = $this->createDeleteForm($token);
+        $form->bind($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('DpavicJobsBundle:Job')->find($id);
+            $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Job entity.');
@@ -254,13 +261,77 @@ class JobController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($token)
     {
-        return $this->createFormBuilder()
-                        ->setAction($this->generateUrl('job_delete', array('id' => $id)))
-                        ->setMethod('DELETE')
-                        ->add('submit', 'submit', array('label' => 'Delete'))
+        return $this->createFormBuilder(array('token' => $token))
+                        ->add('token', 'hidden')
                         ->getForm();
+    }
+
+    /**
+     *  @Route("/{company}/{location}/{token}/{position}", requirements={"id" = "\w+"}, name="job_preview")
+     *  @Template("DpavicJobsBundle:Job:show.html.twig")
+     */
+    public function previewAction($token)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Job entity.');
+        }
+
+        $deleteForm = $this->createDeleteForm($entity->getToken());
+        $publishForm = $this->createPublishForm($entity->getToken());
+
+        return array(
+            'entity' => $entity,
+            'delete_form' => $deleteForm->createView(),
+            'publish_form' => $publishForm->createView(),
+        );
+    }
+
+    /**
+     * @Route("/{token}/publish", name="job_publish")
+     * @Method("POST")
+     * @Template("DpavicJobsBundle:Job:edit.html.twig")
+     * @param type $token
+     */
+    public function publishAction(Request $request, $token)
+    {
+        $form = $this->createPublishForm($token);
+        $form->bind($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
+
+            if (!$entity) {
+                throw $this->createNotFoundException('Unable to find Job entity.');
+            }
+
+            $entity->publish();
+            $em->persist($entity);
+            $em->flush();
+
+            $this->get('session')->getFlashBag()->add('notice', 'Your job is now online for 30 days.');
+        }
+
+        return $this->redirect($this->generateUrl('job_preview', array(
+                            'company' => $entity->getCompanySlug(),
+                            'location' => $entity->getLocationSlug(),
+                            'token' => $entity->getToken(),
+                            'position' => $entity->getPositionSlug()
+        )));
+    }
+
+    private function createPublishForm($token)
+    {
+        return $this->createFormBuilder(array('token' => $token))
+                        ->add('token', 'hidden')
+                        ->getForm()
+        ;
     }
 
 }

@@ -18,8 +18,10 @@ class CategoryRepository extends EntityRepository
         $query = $this->getEntityManager()->createQuery(
                         'SELECT c from DpavicJobsBundle:Category c '
                         . 'LEFT JOIN c.jobs j '
-                        . 'WHERE j.expiresAt > :date')
-                ->setParameter('date', date('Y-m-d H:i:s', time()));
+                        . 'WHERE j.expiresAt > :date '
+                        . 'AND j.isActivated = :activated') 
+                ->setParameter('date', date('Y-m-d H:i:s', time()))
+                ->setParameter('activated', 1);
         
         return $query->getResult();
     }

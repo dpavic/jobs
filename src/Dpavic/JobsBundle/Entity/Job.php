@@ -77,7 +77,6 @@ class Job
     private $howToApply;
 
     /**
-     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $token;
@@ -519,7 +518,7 @@ class Job
     //used in validation to get valid values for the type field
     public static function getTypeValues()
     {
-        return array_keys(self::getTypeValues());
+        return array_keys(self::getTypes());
     }
 
     protected function getUploadDir()
@@ -574,11 +573,40 @@ class Job
      */
     public function removeUpload()
     {
+        $file = $this->getAbsolutePath();
         if (file_exists($file)) {
-            if ($file = $this->getAbsolutePath()) {
-                unlink($file);
-            }
+            unlink($file);
         }
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setTokenValue()
+    {
+        if (!$this->getToken()) {
+            $this->token = sha1($this->getEmail() . rand(1111, 99999));
+        }
+    }
+
+    public function isExpired()
+    {
+        return $this->getDaysBeforeExpires() < 0;
+    }
+
+    public function expiresSoon()
+    {
+        return $this->getDaysBeforeExpires() < 5;
+    }
+
+    public function getDaysBeforeExpires()
+    {
+        return ceil(($this->getExpiresAt()->format('U') - time()) / 86400);
+    }
+
+    public function publish()
+    {
+        $this->setIsActivated(true);
     }
 
 }

@@ -16,9 +16,11 @@ class JobRepository extends EntityRepository
     public function getActiveJobs($category_id = null, $max = null, $offset = null)
     {
         $qb = $this->createQueryBuilder('j')
-                ->where('j.expiresAt > :date')
-                ->setParameter('date', date('Y-m-d H:i:s', time()))
-                ->orderBy('j.expiresAt', 'DESC');
+            ->where('j.expiresAt > :date')
+            ->setParameter('date', date('Y-m-d H:i:s', time()))
+            ->andWhere('j.isActivated = :activated')
+            ->setParameter('activated', 1)
+            ->orderBy('j.expiresAt', 'DESC');
 
         if ($max) {
             $qb->setMaxResults($max);
@@ -40,12 +42,14 @@ class JobRepository extends EntityRepository
     public function getActiveJob($id)
     {
         $query = $this->createQueryBuilder('j')
-                ->where('j.id = :id')
-                ->setParameter('id', $id)
-                ->andWhere('j.expiresAt > :date')
-                ->setParameter('date', date('Y-m-d H:i:s', time()))
-                ->setMaxResults(1)
-                ->getQuery();
+            ->where('j.id = :id')
+            ->setParameter('id', $id)
+            ->andWhere('j.expiresAt > :date')
+            ->setParameter('date', date('Y-m-d H:i:s', time()))
+            ->andWhere('j.isActivated = :activated')
+            ->setParameter('activated', 1)
+            ->setMaxResults(1)
+            ->getQuery();
 
         try {
             $job = $query->getSingleResult();
@@ -59,9 +63,11 @@ class JobRepository extends EntityRepository
     public function countActiveJobs($categoryId = null)
     {
         $qb = $this->createQueryBuilder('j')
-                ->select('count(j.id)')
-                ->where('j.expiresAt > :date')
-                ->setParameter('date', date('Y-m-d H:i:s', time()));
+            ->select('count(j.id)')
+            ->where('j.expiresAt > :date')
+            ->setParameter('date', date('Y-m-d H:i:s', time()))
+            ->andWhere('j.isActivated = :activated')
+            ->setParameter('activated', 1);
 
         if ($categoryId) {
             $qb->andWhere('j.category = :categoryId')
