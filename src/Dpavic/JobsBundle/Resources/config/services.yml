@@ -5,7 +5,7 @@ services:
     dpavic.jobs.admin.category:
         class: Dpavic\JobsBundle\Admin\CategoryAdmin
         tags: 
-            - { name: sonata.admin, manager_type: orm, group: jobs, label: Categories }
+            - { name: sonata.admin, manager_type: orm , group: jobs, label: Categories }
         arguments:
             - ~
             - Dpavic\JobsBundle\Entity\Category
@@ -18,4 +18,4 @@ services:
         arguments:
             - ~
             - Dpavic\JobsBundle\Entity\Job
-            - 'DpavicJobsBundle:JobsAdmin'
+            - 'DpavicJobsBundle:JobAdmin'
