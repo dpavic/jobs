@@ -3,13 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/app/config/config.yml</file>
             <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Admin/JobAdmin.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Resources/config/routing.yml</file>
             <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/JobAdminController.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Resources/config/services.yml</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Admin/CategoryAdmin.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/CategoryAdminController.php</file>
         </group>
     </open-files>
 </project-private>
