@@ -34,14 +34,12 @@ class Category
      * @ORM\Column(type="string", length=100)
      */
     private $name;
-    
+
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true, nullable=true)
      */
     private $slug;
-
     private $activeJobs;
-    
     private $moreJobs;
 
     /**
@@ -177,6 +175,32 @@ class Category
         $this->moreJobs = $moreJobs >= 0 ? $moreJobs : 0;
     }
 
-    
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     * @return Category
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug
+     *
+     * @return string 
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    public function setSlugValue()
+    {
+        $this->slug = \Jobs::slugify($this->getName());
+    }
 
 }
