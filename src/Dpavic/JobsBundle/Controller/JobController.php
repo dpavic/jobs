@@ -42,9 +42,24 @@ class JobController extends Controller
                             ->getParameter('max_jobs_on_homepage'));
         }
 
-        return array(
-            'categories' => $categories,
-        );
+        //get lastUpdated and feedId to send to template index.atom.twig
+        /* @var $latestJob Job */
+        $latestJob = $em->getRepository('DpavicJobsBundle:Job')->getLatestPost();
+
+        if ($latestJob) {
+            $lastUpdated = $latestJob->getCreatedAt()->format(DATE_ATOM);
+        } else {
+            $lastUpdated = new \DateTime();
+            $lastUpdated = $lastUpdated->format(DATE_ATOM);
+        }
+
+        $format = $this->getRequest()->getRequestFormat();
+        //render selected format, default is HTML
+        return $this->render('DpavicJobsBundle:Job:index.' . $format . '.twig', array(
+                    'categories' => $categories,
+                    'lastUpdated' => $lastUpdated,
+                    'feedId' => sha1($this->get('router')->generate('job', array('_format' => 'atom'), true)),
+        ));
     }
 
     /**
