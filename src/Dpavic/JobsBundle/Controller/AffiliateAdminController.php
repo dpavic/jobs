@@ -26,6 +26,17 @@ class AffiliateAdminController extends CRUDController
             foreach ($selectedModels as $selectedModel) {
                 $selectedModel->activate();
                 $modelManager->update($selectedModel);
+
+                $message = \Swift_Message::newInstance()
+                        ->setSubject('Jobs affiliate token')
+                        ->setFrom('dp01091985@gmail.com')
+                        ->setTo($affiliate->getEmail())
+                        ->setBody($this->renderView('DpavicJobsBundle:Affiliate:email.txt.twig', array(
+                            'affiliate' => $affiliate->getToken())
+                        )
+                );
+
+                $this->get('mailer')->send($message);
             }
         }
         catch (\Exception $ex) {
@@ -88,9 +99,20 @@ class AffiliateAdminController extends CRUDController
         try {
             $affiliate->setIsActive(true);
             $em->flush();
+
+            $message = \Swift_Message::newInstance()
+                    ->setSubject('Jobs affiliate token')
+                    ->setFrom('dp01091985@gmail.com')
+                    ->setTo($affiliate->getEmail())
+                    ->setBody($this->renderView('DpavicJobsBundle:Affiliate:email.txt.twig', array(
+                        'affiliate' => $affiliate->getToken())
+                    )
+            );
+
+            $this->get('mailer')->send($message);
         }
         catch (\Exception $ex) {
-            $this->get('session')->getFlashBag()->add('sonanta_flash_error', $ex->getMessage());
+            $this->get('session')->getFlashBag()->add('sonata_flash_error', $ex->getMessage());
             return new RedirectResponse($this->admin->generateUrl('list', $this->admin->getFilterParameters()));
         }
 
@@ -113,7 +135,7 @@ class AffiliateAdminController extends CRUDController
             $em->flush();
         }
         catch (\Exception $ex) {
-            $this->get('session')->getFlashBag()->add('sonanta_flash_error', $ex->getMessage());
+            $this->get('session')->getFlashBag()->add('sonata_flash_error', $ex->getMessage());
             return new RedirectResponse($this->admin->generateUrl('list', $this->admin->getFilterParameters()));
         }
 
