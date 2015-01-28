@@ -3,11 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/AffiliateAdminController.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Controller/JobAdminController.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Entity/Affiliate.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Admin/AffiliateAdmin.php</file>
-            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/src/Dpavic/JobsBundle/Repository/AffiliateRepository.php</file>
+            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/app/config/parameters.yml.dist</file>
+            <file>file:/C:/Program%20Files%20(x86)/EasyPHP-DevServer-14.1VC11/data/localweb/jobs/app/config/parameters.yml</file>
         </group>
     </open-files>
 </project-private>
