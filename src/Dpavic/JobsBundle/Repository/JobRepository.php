@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityRepository;
 class JobRepository extends EntityRepository
 {
 
-    public function getActiveJobs($category_id = null, $max = null, $offset = null)
+    public function getActiveJobs($categoryId = null, $max = null, $offset = null, $affiliateId = null)
     {
         $qb = $this->createQueryBuilder('j')
                 ->where('j.expiresAt > :date')
@@ -30,10 +30,18 @@ class JobRepository extends EntityRepository
             $qb->setFirstResult($offset);
         }
 
-        if ($category_id) {
-            $qb->andWhere('j.category = :category_id')
-                    ->setParameter('category_id', $category_id);
+        if ($categoryId) {
+            $qb->andWhere('j.category = :categoryId')
+                    ->setParameter('categoryId', $categoryId);
         }
+
+        if ($affiliateId) {
+            $qb->leftJoin('j.category', 'c')
+                    ->leftJoin('c.affiliates', 'a')
+                    ->andWhere('a.id = :affiliateId')
+                    ->setParameter('affiliateId', $affiliateId);
+        }
+
         $query = $qb->getQuery();
 
         return $query->getResult();
@@ -86,18 +94,19 @@ class JobRepository extends EntityRepository
                 ->setParameter('activated', 1)
                 ->orderBy('j.expiresAt', 'DESC')
                 ->setMaxResults(1);
-        
-        if($categoryId){
+
+        if ($categoryId) {
             $query->andWhere('j.category = :categoryId')
                     ->setParameter('categoryId', $categoryId);
         }
-        
-        try{
+
+        try {
             $job = $query->getQuery()->getSingleResult();
-        } catch (\Doctrine\ORM\NoResultException $ex) {
+        }
+        catch (\Doctrine\ORM\NoResultException $ex) {
             $job = null;
         }
-        
+
         return $job;
     }
 

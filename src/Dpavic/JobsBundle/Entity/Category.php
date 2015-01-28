@@ -2,7 +2,10 @@
 
 namespace Dpavic\JobsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Dpavic\JobsBundle\Repository\CategoryRepository;
 use Dpavic\JobsBundle\Utils\Jobs as Jobs;
 
 /**
@@ -47,8 +50,8 @@ class Category
      */
     public function __construct()
     {
-        $this->jobs = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->affiliates = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->jobs = new ArrayCollection();
+        $this->affiliates = new ArrayCollection();
     }
 
     public function __toString()
@@ -92,10 +95,10 @@ class Category
     /**
      * Add jobs
      *
-     * @param \Dpavic\JobsBundle\Entity\Job $jobs
+     * @param Job $jobs
      * @return Category
      */
-    public function addJob(\Dpavic\JobsBundle\Entity\Job $jobs)
+    public function addJob(Job $jobs)
     {
         $this->jobs[] = $jobs;
 
@@ -105,9 +108,9 @@ class Category
     /**
      * Remove jobs
      *
-     * @param \Dpavic\JobsBundle\Entity\Job $jobs
+     * @param Job $jobs
      */
-    public function removeJob(\Dpavic\JobsBundle\Entity\Job $jobs)
+    public function removeJob(Job $jobs)
     {
         $this->jobs->removeElement($jobs);
     }
@@ -115,7 +118,7 @@ class Category
     /**
      * Get jobs
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return Collection 
      */
     public function getJobs()
     {
@@ -125,10 +128,10 @@ class Category
     /**
      * Add affiliates
      *
-     * @param \Dpavic\JobsBundle\Entity\Affiliate $affiliates
+     * @param Affiliate $affiliates
      * @return Category
      */
-    public function addAffiliate(\Dpavic\JobsBundle\Entity\Affiliate $affiliates)
+    public function addAffiliate(Affiliate $affiliates)
     {
         $this->affiliates[] = $affiliates;
 
@@ -138,9 +141,9 @@ class Category
     /**
      * Remove affiliates
      *
-     * @param \Dpavic\JobsBundle\Entity\Affiliate $affiliates
+     * @param Affiliate $affiliates
      */
-    public function removeAffiliate(\Dpavic\JobsBundle\Entity\Affiliate $affiliates)
+    public function removeAffiliate(Affiliate $affiliates)
     {
         $this->affiliates->removeElement($affiliates);
     }
@@ -148,7 +151,7 @@ class Category
     /**
      * Get affiliates
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return Collection 
      */
     public function getAffiliates()
     {

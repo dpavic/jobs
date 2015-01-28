@@ -19,3 +19,12 @@ services:
             - ~
             - Dpavic\JobsBundle\Entity\Job
             - 'DpavicJobsBundle:JobAdmin'
+            
+    dpavic.jobs.admin.affiliate:
+        class: Dpavic\JobsBundle\Admin\AffiliateAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: jobs, label: Affiliates }
+        arguments:
+            - ~
+            - Dpavic\JobsBundle\Entity\Affiliate
+            - 'DpavicJobsBundle:AffiliateAdmin'

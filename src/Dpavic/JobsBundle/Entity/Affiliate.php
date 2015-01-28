@@ -2,12 +2,18 @@
 
 namespace Dpavic\JobsBundle\Entity;
 
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\AffiliateRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="affiliate")
+ * @UniqueEntity("email")
  */
 class Affiliate
 {
@@ -28,12 +34,14 @@ class Affiliate
     private $categories;
 
     /**
+     * @Assert\Url()
      * @ORM\Column(type="string", length=255)
      */
     private $url;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Email()
+     * @ORM\Column(name="email", type="string", length=255, unique=true)
      */
     private $email;
 
@@ -57,7 +65,7 @@ class Affiliate
      */
     public function __construct()
     {
-        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     /**
@@ -118,6 +126,7 @@ class Affiliate
 
     /**
      * Set token
+     * Only used in fixtures, for reallife use setTokenValue() instead
      *
      * @param string $token
      * @return Affiliate
@@ -125,7 +134,23 @@ class Affiliate
     public function setToken($token)
     {
         $this->token = $token;
+        return $this;
+    }
 
+    /**
+     * Set Token Value
+     * Generate and set Token when User applies for an account
+     * 
+     * @ORM\PrePersist
+     * 
+     * @return Affiliate
+     */
+    public function setTokenValue()
+    {
+        if (!$this->getToken()) {
+            $token = sha1($this->getEmail() . rand(11111, 99999));
+            $this->token = $token;
+        }
         return $this;
     }
 
@@ -175,7 +200,7 @@ class Affiliate
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return DateTime 
      */
     public function getCreatedAt()
     {
@@ -185,10 +210,10 @@ class Affiliate
     /**
      * Add categories
      *
-     * @param \Dpavic\JobsBundle\Entity\Category $categories
+     * @param Category $categories
      * @return Affiliate
      */
-    public function addCategory(\Dpavic\JobsBundle\Entity\Category $categories)
+    public function addCategory(Category $categories)
     {
         $this->categories[] = $categories;
 
@@ -198,9 +223,9 @@ class Affiliate
     /**
      * Remove categories
      *
-     * @param \Dpavic\JobsBundle\Entity\Category $categories
+     * @param Category $categories
      */
-    public function removeCategory(\Dpavic\JobsBundle\Entity\Category $categories)
+    public function removeCategory(Category $categories)
     {
         $this->categories->removeElement($categories);
     }
@@ -208,11 +233,37 @@ class Affiliate
     /**
      * Get categories
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return Collection 
      */
     public function getCategories()
     {
         return $this->categories;
+    }
+
+    /**
+     * Activate Affiliate in Admin Backend
+     * 
+     * @return type boolean
+     */
+    public function activate()
+    {
+        if (!$this->getIsActive()) {
+            $this->setIsActive(true);
+        }
+        return $this->isActive;
+    }
+
+    /**
+     * Deactivate Affiliate in Admin Backend
+     * 
+     * @return type boolean
+     */
+    public function deactivate()
+    {
+        if ($this->getIsActive()) {
+            $this->setIsActive(false);
+        }
+        return $this->isActive;
     }
 
 }

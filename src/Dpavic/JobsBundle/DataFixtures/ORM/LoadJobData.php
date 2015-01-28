@@ -87,10 +87,44 @@ class LoadJobData extends AbstractFixture implements OrderedFixtureInterface
             $job->setHowToApply('Send your resume to lorem.ipsum [at] dolor.sit');
             $job->setIsPublic(true);
             $job->setIsActivated(true);
-            $job->setToken('job_' . $i);
+            $job->setToken('developer_' . $i);
             $job->setEmail('job@example.com');
 
             $em->persist($job);
+        }
+        
+        for ($i = 100; $i <= 112; $i++) {
+            $manager = new Job();
+            $manager->setCategory($em->merge($this->getReference('category-manager')));
+            $manager->setType('full-time');
+            $manager->setCompany('Company ' . $i);
+            $manager->setPosition('Manger');
+            $manager->setLocation('Rijeka, Croatia');
+            $manager->setDescription('Lorem ipsum dolor sit amet, consectetur adipisicing elit.');
+            $manager->setHowToApply('Send your resume to lorem.ipsum [at] dolor.sit');
+            $manager->setIsPublic(true);
+            $manager->setIsActivated(true);
+            $manager->setToken('manager_' . $i);
+            $manager->setEmail('job@example.com');
+
+            $em->persist($manager);
+        }
+        
+        for ($i = 100; $i <= 120; $i++) {
+            $administrator = new Job();
+            $administrator->setCategory($em->merge($this->getReference('category-administrator')));
+            $administrator->setType('full-time');
+            $administrator->setCompany('Company ' . $i);
+            $administrator->setPosition('Administrator');
+            $administrator->setLocation('Frankfurt am Main, Germany');
+            $administrator->setDescription('Lorem ipsum dolor sit amet, consectetur adipisicing elit.');
+            $administrator->setHowToApply('Send your resume to lorem.ipsum [at] dolor.sit');
+            $administrator->setIsPublic(true);
+            $administrator->setIsActivated(true);
+            $administrator->setToken('administrator_' . $i);
+            $administrator->setEmail('job@example.com');
+
+            $em->persist($administrator);
         }
 
         $em->flush();

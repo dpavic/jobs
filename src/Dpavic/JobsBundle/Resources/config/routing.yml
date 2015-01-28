@@ -19,3 +19,13 @@ login_check:
     
 logout: 
     pattern: /logout
+    
+DpavicJobsBundle_api:
+    pattern: /api/{token}/jobs.{_format}
+    defaults: {_controller: DpavicJobsBundle:Api:list}
+    requirements:
+        _format: xml|json|yaml
+        
+DpavicJobsBundle_affiliate:
+    resource: "@DpavicJobsBundle/Controller/AffiliateController.php"
+    type: annotation
