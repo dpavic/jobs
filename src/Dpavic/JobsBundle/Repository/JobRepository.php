@@ -3,6 +3,8 @@
 namespace Dpavic\JobsBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
+use Dpavic\JobsBundle\Entity\Job;
 
 /**
  * JobRepository
@@ -62,7 +64,7 @@ class JobRepository extends EntityRepository
         try {
             $job = $query->getSingleResult();
         }
-        catch (\Doctrine\ORM\NoResultException $e) {
+        catch (NoResultException $e) {
             $job = null;
         }
         return $job;
@@ -103,11 +105,52 @@ class JobRepository extends EntityRepository
         try {
             $job = $query->getQuery()->getSingleResult();
         }
-        catch (\Doctrine\ORM\NoResultException $ex) {
+        catch (NoResultException $ex) {
             $job = null;
         }
 
         return $job;
+    }
+
+    public function cleanup($days)
+    {
+        $query = $this->createQueryBuilder('j')
+                ->delete()
+                ->where('j.isActivated is NULL')
+                ->andWhere('j.createdAt < :createdAt')
+                ->setParameter('createdAt', date('Y-m-d', time() - 86400 * $days))
+                ->getQuery();
+        
+        return $query->execute();
+    }
+
+    public function getForLuceneQuery($query)
+    {
+        $hits = Job::getLuceneIndex()->find($query);
+
+        $pks = array();
+        foreach ($hits as $hit) {
+            $pks[] = $hit->pk;
+        }
+
+        if (empty($pks)) {
+            return array();
+        }
+
+        $q = $this->createQueryBuilder('j')
+                ->where('j.id IN (:pk)')
+                ->setParameter('pk', $pks)
+                ->andWhere('j.isActivated = :active')
+                ->setParameter('active', 1)
+                ->setMaxResults(20)
+                ->getQuery();
+
+        return $q->getResult();
+    }
+
+    public function getForToken($token)
+    {
+        
     }
 
 }

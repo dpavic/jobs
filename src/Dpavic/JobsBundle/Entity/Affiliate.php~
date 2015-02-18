@@ -6,11 +6,14 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="Dpavic\JobsBundle\Repository\AffiliateRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="affiliate")
+ * @UniqueEntity("email")
  */
 class Affiliate
 {
@@ -31,12 +34,14 @@ class Affiliate
     private $categories;
 
     /**
+     * @Assert\Url()
      * @ORM\Column(type="string", length=255)
      */
     private $url;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Email()
+     * @ORM\Column(name="email", type="string", length=255, unique=true)
      */
     private $email;
 
@@ -233,6 +238,32 @@ class Affiliate
     public function getCategories()
     {
         return $this->categories;
+    }
+
+    /**
+     * Activate Affiliate in Admin Backend
+     * 
+     * @return type boolean
+     */
+    public function activate()
+    {
+        if (!$this->getIsActive()) {
+            $this->setIsActive(true);
+        }
+        return $this->isActive;
+    }
+
+    /**
+     * Deactivate Affiliate in Admin Backend
+     * 
+     * @return type boolean
+     */
+    public function deactivate()
+    {
+        if ($this->getIsActive()) {
+            $this->setIsActive(false);
+        }
+        return $this->isActive;
     }
 
 }

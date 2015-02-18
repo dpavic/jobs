@@ -2,13 +2,14 @@
 
 namespace Dpavic\JobsBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Dpavic\JobsBundle\Entity\Job;
+use Dpavic\JobsBundle\Form\JobType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Dpavic\JobsBundle\Entity\Job;
-use Dpavic\JobsBundle\Form\JobType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Job controller.
@@ -197,6 +198,10 @@ class JobController extends Controller
             throw $this->createNotFoundException('Unable to find Job entity.');
         }
 
+        if ($entity->getIsActivated()) {
+            throw $this->createNotFoundException('Job is activated and cannot be edited.');
+        }
+
         $editForm = $this->createForm(new JobType(), $entity);
         $deleteForm = $this->createDeleteForm($token);
 
@@ -322,11 +327,14 @@ class JobController extends Controller
 
         $deleteForm = $this->createDeleteForm($entity->getToken());
         $publishForm = $this->createPublishForm($entity->getToken());
+        $extendForm = $this->createExtendForm($entity->getToken());
+
 
         return array(
             'entity' => $entity,
             'delete_form' => $deleteForm->createView(),
             'publish_form' => $publishForm->createView(),
+            'extend_form' => $extendForm->createView(),
         );
     }
 
@@ -370,6 +378,86 @@ class JobController extends Controller
                         ->add('token', 'hidden')
                         ->getForm()
         ;
+    }
+
+    /**
+     * @Route("/{token}/extend", name="job_extend")
+     * @Method("POST")
+     * @Template()
+     * 
+     */
+    public function extendAction(Request $request, $token)
+    {
+        $form = $this->createExtendForm($token);
+        $request = $this->getRequest();
+
+        $form->bind($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $entity = $em->getRepository('DpavicJobsBundle:Job')->findOneByToken($token);
+
+            if (!$entity) {
+                throw $this->createNotFoundException('Unable to find Job entity.');
+            }
+
+            if (!$entity->extend()) {
+                throw $this->createNodFoundException('Unable to extend the Job');
+            }
+
+            $em->persist($entity);
+            $em->flush();
+
+            $this->get('session')->getFlashBag()->add('notice', sprintf('Your job validity has been extended until %s', $entity->getExpiresAt()->format('m/d/Y')));
+        }
+
+        return $this->redirect($this->generateUrl('job_preview', array(
+                            'company' => $entity->getCompanySlug(),
+                            'location' => $entity->getLocationSlug(),
+                            'token' => $entity->getToken(),
+                            'position' => $entity->getPositionSlug()
+        )));
+    }
+
+    private function createExtendForm($token)
+    {
+        return $this->createFormBuilder(array('token' => $token))
+                        ->add('token', 'hidden')
+                        ->getForm();
+    }
+
+    /**
+     * @Route("/search", name="search")
+     * @Template()
+     * 
+     * @param Request $request
+     * @return type array 
+     */
+    public function searchAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $query = $this->getRequest()->get('query');
+
+        if (!$query) {
+            if (!$request->isXmlHttpRequest()) {
+                return $this->redirect($this->generateUrl('job'));
+            } else {
+                return new Response('No results.');
+            }
+        }
+
+        $jobs = $em->getRepository('DpavicJobsBundle:Job')->getForLuceneQuery($query);
+
+        if ($request->isXmlHttpRequest()) {
+            if('*' == $query || !$jobs || $query == ''){
+                return new Response('No results.');
+            }
+            return $this->render('DpavicJobsBundle:Job:list.html.twig', array(
+                'jobs' => $jobs
+            ));
+        }
+        
+        return array('jobs' => $jobs);
     }
 
 }
